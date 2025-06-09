@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "module": "Commonjs",
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ESNext",
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "paths": {
+      "@dtos": [
+        "./dtos"
+      ],
+      "@modules": [
+        "./modules"
+      ],
+      "@configs": [
+        "./configs"
+      ],
+      "@helpers": [
+        "./helpers"
+      ],
+      "@filters": [
+        "./filters"
+      ],
+      "@interceptors": [
+        "./interceptors"
+      ],
+      "@types": [
+        "./types"
+      ],
+    },
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
+  }
+}
