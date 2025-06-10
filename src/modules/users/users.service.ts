@@ -28,12 +28,28 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
     let user = await this.userModel.findOne({ id: body.id })
     if (user) {
       let seconds = this.secondsPassedSince(user.lastCalculatedEnergyDate)
-      let energy = seconds > 0 ? user.energy + seconds * user.energyQuality: user.energy
-      user.energy = energy >= user.energyCapacity ? user.energyCapacity: energy
+      let energy = seconds > 0 ? user.energy + seconds * user.energyQuality : user.energy
+      user.energy = energy >= user.energyCapacity ? user.energyCapacity : energy
       user.lastCalculatedEnergyDate = new Date()
+      if (!user.refCode) {
+        let code = this.generateCode();
+        let existingCode = await this.userModel.findOne({ refCode: code });
+        while (existingCode) {
+          code = this.generateCode();
+          existingCode = await this.userModel.findOne({ refCode: code });
+        }
+        user.refCode = code
+        user.save()
+      }
       return user
     } else {
-      let newUser = await this.userModel.create({ ...body })
+      let code = this.generateCode();
+      let existingCode = await this.userModel.findOne({ refCode: code });
+      while (existingCode) {
+        code = this.generateCode();
+        existingCode = await this.userModel.findOne({ refCode: code });
+      }
+      let newUser = await this.userModel.create({ ...body, refCode: code })
       return newUser
     }
   }
@@ -42,16 +58,26 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
     let user = await this.userModel.findOne({ id: userId })
     if (user && user.lastCalculatedEnergyDate) {
       let seconds = this.secondsPassedSince(user.lastCalculatedEnergyDate)
-      let energy = seconds > 0 ? user.energy + seconds * user.energyQuality: user.energy
-      user.energy = energy >= user.energyCapacity ? user.energyCapacity: energy
+      let energy = seconds > 0 ? user.energy + seconds * user.energyQuality : user.energy
+      user.energy = energy >= user.energyCapacity ? user.energyCapacity : energy
       user.lastCalculatedEnergyDate = new Date()
       user.save()
       return user
     }
 
-    if(user){
+    if (user) {
       return user
     }
+  }
+
+  generateCode(length = 15) {
+    const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+    let code = "";
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      code += characters[randomIndex];
+    }
+    return code;
   }
 
   secondsPassedSince(givenDate: Date): number {
