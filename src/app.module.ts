@@ -14,8 +14,7 @@ import { UsersModule } from './modules/users/users.module';
     }),
     CacheModule.register({
       isGlobal: true, // har yerda foydalanish uchun
-      ttl: 3600 * 1000, // 1 soat (millisecondlarda)
-      max: 10000  ,         // maksimal cache elementlar soni
+      ttl: 60 * 1000, // 1 soat (millisecondlarda)
     }),
     CoinsModule,
     UsersModule,
