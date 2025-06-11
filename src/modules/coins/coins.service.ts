@@ -76,7 +76,7 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
         return user.toObject();
       }
     } catch (error) {
-      this.logger.error(`Error updating coins for user ${body.id}: ${error.message}`);
+      this.logger.error(`Error updating coins for user ${body.id}: ${error}`);
       throw new Error(`Failed to update coins: ${error.message}`);
     }
   }
