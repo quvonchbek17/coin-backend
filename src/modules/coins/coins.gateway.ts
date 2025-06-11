@@ -38,14 +38,6 @@ export class CoinsGateway
     return this.logger.log(`Init ${CoinsGateway.name}`);
   }
 
-  // User sends a message
-  @SubscribeMessage('msgToServer')
-  handleMessage(@MessageBody() data: MessageDTO): void {
-    data.id = uuidv4();
-    this.logger.log(`New message: ${data.body} by user: ${data.name}`);
-    this.server.to(data.room).emit('msgToClient', data);
-  }
-
   // User joins a room
   @SubscribeMessage('addCoin')
   public async addCoin(
@@ -54,8 +46,7 @@ export class CoinsGateway
   ) {
     this.logger.log(JSON.stringify(body));
     this.coinsService.updateCoin(body)
-    // client.join(room);
-    // client.emit('joinedRoom', room);
+
   }
 
 
@@ -79,5 +70,3 @@ export class CoinsGateway
     return this.logger.log(`Client: ${client.id} connected`);
   }
 }
-
-// TODO: implement mongo
