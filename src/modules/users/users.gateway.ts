@@ -12,18 +12,19 @@ import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { CoinsService } from 'modules/coins/coins.service';
 
 @WebSocketGateway({ namespace: 'users', cors: { origin: '*' } })
 export class UsersGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService, private readonly coinService: CoinsService) {}
 
   @WebSocketServer() server: Server;
 
   private logger: Logger = new Logger(UsersGateway.name);
 
-  // userId -> socketId
+  // id -> socketId
   private userSocketMap = new Map<string, string>();
 
   // Gateway init
@@ -43,9 +44,9 @@ export class UsersGateway
   handleDisconnect(@ConnectedSocket() client: Socket): void {
     this.logger.log(`User disconnected: ${client.id}`);
 
-    for (const [userId, socketId] of this.userSocketMap.entries()) {
+    for (const [id, socketId] of this.userSocketMap.entries()) {
       if (socketId === client.id) {
-        this.userSocketMap.delete(userId);
+        this.userSocketMap.delete(id);
         break;
       }
     }
@@ -61,7 +62,7 @@ export class UsersGateway
 
     const user = await this.usersService.createOrGetUser(body);
 
-    // userId bilan socketni bog'lash
+    // id bilan socketni bog'lash
     this.userSocketMap.set(String(user.id), client.id);
 
     // javobni clientga yuborish
@@ -70,14 +71,14 @@ export class UsersGateway
 
   // Har 10 soniyada har bir foydalanuvchiga uning o'z ma'lumotlarini yuborish
   private async sendUserUpdates() {
-    for (const [userId, socketId] of this.userSocketMap.entries()) {
+    for (const [id, socketId] of this.userSocketMap.entries()) {
       try {
-        const user = await this.usersService.findById(userId);
+        const user = await this.coinService.getUserDatas({id});
         if (user) {
           this.server.to(socketId).emit('userUpdate', user);
         }
       } catch (err) {
-        this.logger.error(`Error sending update to user ${userId}: ${err.message}`);
+        this.logger.error(`Error sending update to user ${id}: ${err.message}`);
       }
     }
   }
