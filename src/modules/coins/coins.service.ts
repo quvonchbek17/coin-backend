@@ -64,7 +64,10 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
         return redisUsers[existingUserIndex];
       } else {
 
-        let user = await this.userModel.findOne({ id: body.id }).populate('referredUsers').exec();
+        let user = await this.userModel.findOne({ id: body.id }).populate({
+          path: 'referredUsers',
+          select: 'id username first_name last_name',
+        }).exec();
         user.coins = body.coinCount ? body.coinCount + user.coins : user.coins;
 
         let seconds = this.secondsPassedSince(user.lastCalculatedEnergyDate)
@@ -98,7 +101,10 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
         await this.cacheManager.set('users', redisUsers);
         return redisUsers[existingUserIndex];
       } else {
-        let user = await this.userModel.findOne({ id: body.id }).populate('referredUsers');
+        let user = await this.userModel.findOne({ id: body.id }).populate({
+          path: 'referredUsers',
+          select: 'id username first_name last_name',
+        });
 
         let seconds = this.secondsPassedSince(user.lastCalculatedEnergyDate)
         let energy = seconds > 0 ? user.energy + seconds * user.energyQuality : user.energy
@@ -152,7 +158,10 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
         if (userIndex !== -1) {
           redisUsers[userIndex] = user;
         } else {
-          const dbUser = await this.userModel.findOne({ id: id }).populate('referredUsers').exec();
+          const dbUser = await this.userModel.findOne({ id: id }).populate({
+            path: 'referredUsers',
+            select: 'id username first_name last_name',
+          }).exec();
           if (dbUser) {
             redisUsers.push(dbUser.toObject());
           }
