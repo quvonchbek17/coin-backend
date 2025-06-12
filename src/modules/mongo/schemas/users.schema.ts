@@ -82,11 +82,9 @@ export class Users {
   })
   todayActiveMilliSeconds: number;
 
-  @Prop([{
-    type: Types.ObjectId,
-    ref: 'Users'
-  }])
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Users' }] })
   referredUsers: Types.ObjectId[];
+
 }
 
 export const usersSchema = SchemaFactory.createForClass(Users);
