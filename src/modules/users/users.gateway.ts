@@ -58,7 +58,6 @@ export class UsersGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: CreateUserDto,
   ) {
-    this.logger.log(`Received user: ${JSON.stringify(body)}`);
 
     const user = await this.usersService.createOrGetUser(body);
 
