@@ -28,15 +28,24 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
     private readonly coinService: CoinsService
   ) { }
   async createOrGetUser(body: CreateUserDto): Promise<any> {
-    let user = await this.userModel.findOne({ id: body.id })
+    let user = await this.userModel.findOne({ id: body.id }).populate({
+      path: 'referredUsers',
+      select: 'id first_name last_name createdAt'
+    });
     if (user) {
-      let userData = await this.coinService.getUserDatas({id: user.id})
+      let userData = await this.coinService.getUserDatas({ id: user.id })
       if (!user.refCode) {
         let code = this.generateCode();
-        let existingCode = await this.userModel.findOne({ refCode: code });
+        let existingCode = await this.userModel.findOne({ refCode: code }).populate({
+          path: 'referredUsers',
+          select: 'id first_name last_name createdAt'
+        });
         while (existingCode) {
           code = this.generateCode();
-          existingCode = await this.userModel.findOne({ refCode: code });
+          existingCode = await this.userModel.findOne({ refCode: code }).populate({
+            path: 'referredUsers',
+            select: 'id first_name last_name createdAt'
+          });
         }
         user.refCode = code
         user.save()
@@ -45,10 +54,16 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
       return userData
     } else {
       let code = this.generateCode();
-      let existingCode = await this.userModel.findOne({ refCode: code });
+      let existingCode = await this.userModel.findOne({ refCode: code }).populate({
+        path: 'referredUsers',
+        select: 'id first_name last_name createdAt'
+      });
       while (existingCode) {
         code = this.generateCode();
-        existingCode = await this.userModel.findOne({ refCode: code });
+        existingCode = await this.userModel.findOne({ refCode: code }).populate({
+          path: 'referredUsers',
+          select: 'id first_name last_name createdAt'
+        });
       }
       let newUser = await this.userModel.create({ ...body, refCode: code })
       return newUser
