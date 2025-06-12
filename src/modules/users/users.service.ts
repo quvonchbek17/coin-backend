@@ -28,21 +28,15 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
     private readonly coinService: CoinsService
   ) { }
   async createOrGetUser(body: CreateUserDto): Promise<any> {
-    let user = await this.userModel.findOne({ id: body.id }).populate({
-      path: 'referredUsers',
-      select: 'id first_name last_name createdAt'
-    });
+    let user = await this.userModel.findOne({ id: body.id });
     if (user) {
       let userData = await this.coinService.getUserDatas({ id: user.id })
       if (!user.refCode) {
         let code = this.generateCode();
-        let existingCode = await this.userModel.findOne({ refCode: code }).populate('referredUsers');
+        let existingCode = await this.userModel.findOne({ refCode: code });
         while (existingCode) {
           code = this.generateCode();
-          existingCode = await this.userModel.findOne({ refCode: code }).populate({
-            path: 'referredUsers',
-            select: 'id first_name last_name createdAt'
-          });
+          existingCode = await this.userModel.findOne({ refCode: code });
         }
         user.refCode = code
         user.save()
@@ -51,13 +45,10 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
       return userData
     } else {
       let code = this.generateCode();
-      let existingCode = await this.userModel.findOne({ refCode: code }).populate({
-        path: 'referredUsers',
-        select: 'id first_name last_name createdAt'
-      });
+      let existingCode = await this.userModel.findOne({ refCode: code });
       while (existingCode) {
         code = this.generateCode();
-        existingCode = await this.userModel.findOne({ refCode: code }).populate('referredUsers');
+        existingCode = await this.userModel.findOne({ refCode: code });
       }
       let newUser = await this.userModel.create({ ...body, refCode: code })
       return newUser
