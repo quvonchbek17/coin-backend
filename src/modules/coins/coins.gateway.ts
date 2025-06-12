@@ -44,18 +44,15 @@ export class CoinsGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: any,
   ) {
-    this.logger.log(JSON.stringify(body));
     this.coinsService.updateCoin(body)
 
   }
-
 
   @SubscribeMessage('getUserDatas')
   public async updateEnergy(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: {id: string},
   ) {
-    this.logger.log(JSON.stringify(body));
     let user = await this.coinsService.getUserDatas(body)
     client.emit('getUserDatasResponse', user);
   }
