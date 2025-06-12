@@ -57,6 +57,8 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
         redisUsers[existingUserIndex].energy = energy >= redisUser.energyCapacity ? redisUser.energyCapacity : energy
         redisUsers[existingUserIndex].lastCalculatedEnergyDate = new Date();
 
+        console.log(redisUser)
+
         await this.cacheManager.set('users', redisUsers);
         this.pendingUpdates[body.id] = redisUsers[existingUserIndex];
         return redisUsers[existingUserIndex];
@@ -72,6 +74,8 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
         let energy = seconds > 0 ? user.energy + seconds * user.energyQuality : user.energy
         user.energy = energy >= user.energyCapacity ? user.energyCapacity : energy
         user.lastCalculatedEnergyDate = new Date();
+
+        console.log(user)
 
         redisUsers.push(user.toObject());
         await this.cacheManager.set('users', redisUsers);
