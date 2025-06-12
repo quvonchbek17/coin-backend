@@ -36,10 +36,7 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
       let userData = await this.coinService.getUserDatas({ id: user.id })
       if (!user.refCode) {
         let code = this.generateCode();
-        let existingCode = await this.userModel.findOne({ refCode: code }).populate({
-          path: 'referredUsers',
-          select: 'id first_name last_name createdAt'
-        });
+        let existingCode = await this.userModel.findOne({ refCode: code }).populate('referredUsers');
         while (existingCode) {
           code = this.generateCode();
           existingCode = await this.userModel.findOne({ refCode: code }).populate({
@@ -60,10 +57,7 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
       });
       while (existingCode) {
         code = this.generateCode();
-        existingCode = await this.userModel.findOne({ refCode: code }).populate({
-          path: 'referredUsers',
-          select: 'id first_name last_name createdAt'
-        });
+        existingCode = await this.userModel.findOne({ refCode: code }).populate('referredUsers');
       }
       let newUser = await this.userModel.create({ ...body, refCode: code })
       return newUser
