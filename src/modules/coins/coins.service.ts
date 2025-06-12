@@ -66,7 +66,7 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
 
         let user = await this.userModel.findOne({ id: body.id }).populate({
           path: 'referredUsers',
-          select: 'id username first_name last_name',
+          select: 'id first_name last_name createdAt',
         }).exec();
         user.coins = body.coinCount ? body.coinCount + user.coins : user.coins;
 
@@ -103,7 +103,7 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
       } else {
         let user = await this.userModel.findOne({ id: body.id }).populate({
           path: 'referredUsers',
-          select: 'id username first_name last_name',
+          select: 'id first_name last_name createdAt',
         });
 
         let seconds = this.secondsPassedSince(user.lastCalculatedEnergyDate)
@@ -160,7 +160,7 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
         } else {
           const dbUser = await this.userModel.findOne({ id: id }).populate({
             path: 'referredUsers',
-            select: 'id username first_name last_name',
+            select: 'id first_name last_name createdAt',
           }).exec();
           if (dbUser) {
             redisUsers.push(dbUser.toObject());
