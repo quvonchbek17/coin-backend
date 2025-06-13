@@ -48,6 +48,15 @@ export class CoinsGateway
 
   }
 
+  @SubscribeMessage('updateEnergyAndClick')
+  public async updateEnergyAndClick(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: any,
+  ) {
+    this.coinsService.updateEnergyAndClickQuality(body)
+
+  }
+
   @SubscribeMessage('getUserDatas')
   public async updateEnergy(
     @ConnectedSocket() client: Socket,
