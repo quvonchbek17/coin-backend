@@ -45,11 +45,8 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
         let redisUser = redisUsers[existingUserIndex]
         redisUsers[existingUserIndex].coins = body.coinCount ? redisUser.coins + body.coinCount : redisUser.coins;
         redisUsers[existingUserIndex].energy = body.energy ? body.energy : redisUser.energy;
-        redisUsers[existingUserIndex].energyCapacity = body.energyCapacity ? body.energyCapacity : redisUser.energyCapacity;
         redisUsers[existingUserIndex].level = body.level ? body.level : redisUser.level;
         redisUsers[existingUserIndex].totalTaps = body.totalTaps ? body.totalTaps : redisUser.totalTaps;
-        redisUsers[existingUserIndex].energyQuality = body.energyQuality ? body.energyQuality : redisUser.energyQuality;
-        redisUsers[existingUserIndex].clickQuality = body.clickQuality ? body.clickQuality : redisUser.clickQuality;
         redisUsers[existingUserIndex].lastClickDate = new Date();
 
         let seconds = this.secondsPassedSince(redisUser.lastCalculatedEnergyDate)
@@ -73,6 +70,8 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
         user.energy = energy >= user.energyCapacity ? user.energyCapacity : energy
         user.lastCalculatedEnergyDate = new Date();
 
+        user.save()
+
         redisUsers.push(user.toObject());
         await this.cacheManager.set('users', redisUsers);
         this.pendingUpdates[body.id] = user.toObject()
@@ -81,6 +80,46 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
     } catch (error) {
       this.logger.error(`Error updating coins for user ${body.id}: ${error}`);
       throw new Error(`Failed to update coins: ${error.message}`);
+    }
+  }
+
+    async updateEnergyAndClickQuality(body: any): Promise<Partial<Users>> {
+    try {
+      let redisUsers: Users[] = (await this.cacheManager.get<Users[]>('users')) || [];
+
+      const existingUserIndex = redisUsers.findIndex(user => user.id === body.id);
+      if (existingUserIndex !== -1) {
+        let redisUser = redisUsers[existingUserIndex]
+        redisUsers[existingUserIndex].coins = body.coins ? body.coins : redisUser.coins;
+        redisUsers[existingUserIndex].energyCapacity = body.energyCapacity ? body.energyCapacity : redisUser.energyCapacity;
+        redisUsers[existingUserIndex].energyQuality = body.energyQuality ? body.energyQuality : redisUser.energyQuality;
+        redisUsers[existingUserIndex].clickQuality = body.clickQuality ? body.clickQuality : redisUser.clickQuality;
+
+        await this.cacheManager.set('users', redisUsers);
+        this.pendingUpdates[body.id] = redisUsers[existingUserIndex];
+        return redisUsers[existingUserIndex];
+      } else {
+
+        let user = await this.userModel.findOne({ id: body.id }).populate({
+          path: 'referredUsers',
+          select: 'id first_name last_name createdAt',
+        }).exec();
+
+        user.coins = body.coins ? body.coins : user.coins;
+        user.energyCapacity = body.energyCapacity ? user.energyCapacity + body.energyCapacity : user.energyCapacity;
+        user.energyQuality = body.energyQuality ? user.energyQuality + body.energyQuality : user.energyQuality;
+        user.clickQuality = body.clickQuality ? user.clickQuality + body.clickQuality : user.clickQuality;
+
+        user.save()
+
+        redisUsers.push(user.toObject());
+        await this.cacheManager.set('users', redisUsers);
+        this.pendingUpdates[body.id] = user.toObject()
+        return user.toObject();
+      }
+    } catch (error) {
+      this.logger.error(`Error updating energy an click quality for user ${body.id}: ${error}`);
+      throw new Error(`Failed to update energy an click quality: ${error.message}`);
     }
   }
 
