@@ -90,7 +90,7 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
       const existingUserIndex = redisUsers.findIndex(user => user.id === body.id);
       if (existingUserIndex !== -1) {
         let redisUser = redisUsers[existingUserIndex]
-        redisUsers[existingUserIndex].coins = body.coins ? body.coins : redisUser.coins;
+        redisUsers[existingUserIndex].coins = body.cost ? redisUser.coins - body.cost : redisUser.coins;
         redisUsers[existingUserIndex].energyCapacity = body.energyCapacity ? redisUser.energyCapacity + body.energyCapacity : redisUser.energyCapacity;
         redisUsers[existingUserIndex].energyQuality = body.energyQuality ? redisUser.energyQuality + body.energyQuality : redisUser.energyQuality;
         redisUsers[existingUserIndex].clickQuality = body.clickQuality ? redisUser.clickQuality + body.clickQuality : redisUser.clickQuality;
@@ -105,7 +105,7 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
           select: 'id first_name last_name createdAt',
         }).exec();
 
-        user.coins = body.coins ? body.coins : user.coins;
+        user.coins = body.cost ? user.coins - body.cost : user.coins;
         user.energyCapacity = body.energyCapacity ? user.energyCapacity + body.energyCapacity : user.energyCapacity;
         user.energyQuality = body.energyQuality ? user.energyQuality + body.energyQuality : user.energyQuality;
         user.clickQuality = body.clickQuality ? user.clickQuality + body.clickQuality : user.clickQuality;
