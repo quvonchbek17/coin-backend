@@ -44,6 +44,7 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
       if (existingUserIndex !== -1) {
         let redisUser = redisUsers[existingUserIndex]
         redisUsers[existingUserIndex].coins = body.coinCount ? redisUser.coins + body.coinCount : redisUser.coins;
+        redisUsers[existingUserIndex].levelCoins = body.coinCount ? redisUser.levelCoins + body.coinCount : redisUser.levelCoins;
         redisUsers[existingUserIndex].energy = body.energy ? body.energy : redisUser.energy;
         redisUsers[existingUserIndex].level = body.level ? body.level : redisUser.level;
         redisUsers[existingUserIndex].totalTaps = body.totalTaps ? body.totalTaps : redisUser.totalTaps;
@@ -64,6 +65,7 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
           select: 'id first_name last_name createdAt',
         }).exec();
         user.coins = body.coinCount ? body.coinCount + user.coins : user.coins;
+        user.levelCoins = body.coinCount ? body.coinCount + user.levelCoins : user.levelCoins;
 
         let seconds = this.secondsPassedSince(user.lastCalculatedEnergyDate)
         let energy = seconds > 0 ? user.energy + seconds * user.energyQuality : user.energy
@@ -172,6 +174,7 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
           update: {
             coins: user.coins,
             level: user.level,
+            levelCoins: user.levelCoins,
             energy: user.energy,
             energyCapacity: user.energyCapacity,
             totalTaps: user.totalTaps,
