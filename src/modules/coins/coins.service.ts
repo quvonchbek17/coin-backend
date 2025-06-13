@@ -91,9 +91,9 @@ export class CoinsService implements OnModuleInit, OnModuleDestroy {
       if (existingUserIndex !== -1) {
         let redisUser = redisUsers[existingUserIndex]
         redisUsers[existingUserIndex].coins = body.coins ? body.coins : redisUser.coins;
-        redisUsers[existingUserIndex].energyCapacity = body.energyCapacity ? body.energyCapacity : redisUser.energyCapacity;
-        redisUsers[existingUserIndex].energyQuality = body.energyQuality ? body.energyQuality : redisUser.energyQuality;
-        redisUsers[existingUserIndex].clickQuality = body.clickQuality ? body.clickQuality : redisUser.clickQuality;
+        redisUsers[existingUserIndex].energyCapacity = body.energyCapacity ? redisUser.energyCapacity + body.energyCapacity : redisUser.energyCapacity;
+        redisUsers[existingUserIndex].energyQuality = body.energyQuality ? redisUser.energyQuality + body.energyQuality : redisUser.energyQuality;
+        redisUsers[existingUserIndex].clickQuality = body.clickQuality ? redisUser.clickQuality + body.clickQuality : redisUser.clickQuality;
 
         await this.cacheManager.set('users', redisUsers);
         this.pendingUpdates[body.id] = redisUsers[existingUserIndex];
