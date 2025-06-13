@@ -34,6 +34,11 @@ export class Users {
   level: number;
 
   @Prop({
+    default: 1
+  })
+  levelCoins: number;
+
+  @Prop({
     default: 0
   })
   totalTaps: number;
